@@ -1,0 +1,30 @@
+COD_IBGE	Codigo IBGE do MunicÃ­pio
+MUNICIPIO	Nome do municipio
+COD_REGIAO_COVID	Codigo da regiao de saude COVID
+REGIAO_COVID	Nome da regiao de saude COVID
+SEXO	Sexo
+FAIXAETARIA	Faixa etaria
+CRITERIO	Tipo de teste
+DATA_CONFIRMACAO	Data de confirmacao
+DATA_SINTOMAS	Data de inicio dos sintomas
+DATA_INCLUSAO	Data de inclusao no dashboard do RS
+DATA_EVOLUCAO	Data da evolucao
+EVOLUCAO	descricao da evolucao
+HOSPITALIZADO	Paciente foi hospitalizado
+FEBRE	Sintomas de febre
+TOSSE	Sintomas de tosse
+GARGANTA	Sintomas de dor de garganta
+DISPNEIA	Sintomas de dor de dispneia/falta de ar
+OUTROS	Outros sintomas
+CONDICOES	Alguma condicao de saude que necessite atencao
+GESTANTE	Paciente eh gestante
+DATA_INCLUSAO_OBITO	Data de inclusao da informacao de obito
+DATA_EVOLUCAO_ESTIMADA	Data da evolucao estimada (casos nao hospitalizados)
+RACA_COR	raça/Cor
+ETNIA_INDIGENA	Etnia indigena
+PROFISSIONAL_SAUDE	Profissional de saude
+BAIRRO	Bairro (apenas municipios com mais de 100.000 hab)
+SRAG	Paciente apresentou sÃ­ndrome respiratoria aguda grave
+FONTE_INFORMACAO	Fonte da informacao
+PAIS_NASCIMENTO	Pais de nascimento
+PES_PRIV_LIBERDADE	Pessoa privada de liberdade
