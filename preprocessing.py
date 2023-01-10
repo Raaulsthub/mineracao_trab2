@@ -8,23 +8,17 @@ WOMEN = 1
 SIM = 1
 NAO = 0
 
+BRASILEIRO = 1
+ESTRANGEIRO = 0
 
 # importing the dataframe
-data = pd.read_csv('./data/final.csv')
+data = pd.read_csv('./data/saudeRS_2022.csv', sep=';')
 
 # converting all strings to lowercase
 data = data.apply(lambda x: x.astype(str).str.lower())
 
 # filling missing values with zero
 data.fillna(0, inplace=True)
-
-# treating inconsistences in rows
-# my  line of thought is that, if there is an inconcistence at a row, no value on that row can be trusted
-# every time an inconcistence is found, like "SRAG: 12/07/2020", the whole row will be deleted
-data = data[(data['GESTANTE'] == 'sim') | (data['GESTANTE'] == 'nao') | (data['GESTANTE'] == 'nan')]
-data = data[(data['PROFISSIONAL_SAUDE'] == 'sim') | (data['PROFISSIONAL_SAUDE'] == 'nao') | (data['PROFISSIONAL_SAUDE'] == 'nan')]
-data = data[(data['SRAG'] == 'sim') | (data['SRAG'] == 'nao') | (data['SRAG'] == 'nan')]
-data = data[(data['PES_PRIV_LIBERDADE'] == 'sim') | (data['PES_PRIV_LIBERDADE'] == 'nao') | (data['PES_PRIV_LIBERDADE'] == 'nan')]
 
 # turning columns into zeros and ones
 # note: i want to add .astype(int) in the end
@@ -36,25 +30,33 @@ data['GARGANTA'] = data['GARGANTA'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).as
 data['DISPNEIA'] = data['DISPNEIA'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
 data['OUTROS'] = data['OUTROS'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
 data['GESTANTE'] = data['GESTANTE'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
-data['PROFISSIONAL_SAUDE'] = data['PROFISSIONAL_SAUDE'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
+data['PROFISSIONAL_SAUDE'] = data['PROFISSIONAL_SAUDE'].map({'sim': SIM, 'nao': NAO, 'nao informado': NAO}).astype(int)
 data['SRAG'] = data['SRAG'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
 data['PES_PRIV_LIBERDADE'] = data['PES_PRIV_LIBERDADE'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
 
-# poping dates out of the data frame
+# condicoes will be implemented as yes or no
+aux  = np.zeros(len(data['CONDICOES'])).astype(int)
+itr = 0
+for i in data['CONDICOES']:
+       if i != 'nan':
+              aux[itr] = 1
+       itr += 1
+
+data['CONDICOES'] = aux
+
+# etnia indigen will be implemented as yes or no
+aux  = np.zeros(len(data['ETNIA_INDIGENA'])).astype(int)
+itr = 0
+for i in data['ETNIA_INDIGENA']:
+       if i != 'nan' and i != 'nao encontrado':
+              aux[itr] = 1
+       itr += 1
+data['ETNIA_INDIGENA'] = aux
+
+# poping dates out of the data frame/
 data.drop(['DATA_CONFIRMACAO', 'DATA_SINTOMAS', 'DATA_INCLUSAO', 'DATA_EVOLUCAO', 'DATA_INCLUSAO_OBITO', 'DATA_EVOLUCAO_ESTIMADA'], axis=1, inplace=True)
 
-
-# list of columns to zero and 1
-# - indigena
-
-# list of columns to one hot encoding
-# - cod regiao covid, faixa etaria, criterio, evolucao, raca_cor
-
-# dont know
-# - fonte de informacao
-# - pais nascimento
-
-# one hot encoding
+# ONE HOT ENCODING
 
 # FAIXA ETARIA
 data['IDADE_1'] = np.zeros(len(data['FAIXAETARIA']))
@@ -101,6 +103,83 @@ for i in data['FAIXAETARIA']:
 
 data.drop(['FAIXAETARIA'], axis=1, inplace=True)
 
+# CRITERIO
+data['TESTE_RTPCR'] = np.zeros(len(data['CRITERIO']))
+data['TESTE_RAPIDO'] = np.zeros(len(data['CRITERIO']))
+data['TESTE_OUTRO'] = np.zeros(len(data['CRITERIO']))
+data['TESTE_CLINICO_EPI'] = np.zeros(len(data['CRITERIO']))
+data['TESTE_CLINICO_IMG'] = np.zeros(len(data['CRITERIO']))
+data['TESTE_CLINICO'] = np.zeros(len(data['CRITERIO']))
+
+itr = 0
+for i in data['CRITERIO']:
+       if i == 'rt-pcr':
+              data['TESTE_RTPCR'][itr] = 1
+       elif i == 'teste rápido':
+              data['TESTE_RAPIDO'][itr] = 1
+       elif i == 'outros testes':
+              data['TESTE_OUTRO'][itr] = 1
+       elif i == 'clínico epidemiológico':
+              data['TESTE_CLINICO_EPI'][itr] = 1
+       elif i == 'clínico-imagem':
+              data['TESTE_CLINICO_IMG'][itr] = 1
+       elif i == 'clínico':
+              data['TESTE_CLINICO'][itr] = 1
+       itr += 1
+
+data.drop(['CRITERIO'], axis=1, inplace=True)
+
+# EVOLUCAO ['RECUPERADO', 'OBITO', 'OBITO OUTRAS CAUSAS']
+
+data['EVOLUCAO_RECUPERADO'] = np.zeros(len(data['EVOLUCAO']))
+data['EVOLUCAO_OBITO'] = np.zeros(len(data['EVOLUCAO']))
+data['EVOLUCAO_OBITO_OC'] = np.zeros(len(data['EVOLUCAO']))
+
+itr = 0
+for i in data['EVOLUCAO']:
+       if i == 'recuperado':
+              data['EVOLUCAO_RECUPERADO'][itr] = 1
+       elif i == 'obito':
+              data['EVOLUCAO_OBITO'][itr] = 1
+       elif i == 'obito outras causas':
+              data['EVOLUCAO_OBITO_OC'][itr] = 1
+       itr += 1
+
+data.drop(['EVOLUCAO'], axis=1, inplace=True)
+
+
+# RACA_COR 'BRANCA', 'NAO INFORMADO', 'PARDA', 'PRETA', 'AMARELA', 'INDIGENA'
+data['RACA_COR_BRANCA'] = np.zeros(len(data['RACA_COR']))
+data['RACA_COR_NA'] = np.zeros(len(data['RACA_COR']))
+data['RACA_COR_PARDA'] = np.zeros(len(data['RACA_COR']))
+data['RACA_COR_PRETA'] = np.zeros(len(data['RACA_COR']))
+data['RACA_COR_AMARELA'] = np.zeros(len(data['RACA_COR']))
+data['RACA_COR_INDIGENA'] = np.zeros(len(data['RACA_COR']))
+
+itr = 0
+for i in data['RACA_COR']:
+       if i == 'branca':
+              data['RACA_COR_BRANCA'][itr] = 1
+       elif i == 'nao informado':
+              data['RACA_COR_NA'][itr] = 1
+       elif i == 'parda':
+              data['RACA_COR_PARDA'][itr] = 1
+       elif i == 'preta':
+              data['RACA_COR_PRETA'][itr] = 1
+       elif i == 'amarela':
+              data['RACA_COR_AMARELA'][itr] = 1
+       elif i == 'indigena':
+              data['RACA_COR_INDIGENA'][itr] = 1
+       itr += 1
+
+data.drop(['RACA_COR'], axis=1, inplace=True)
+
+# dont know
+# - fonte de informacao - one hot
+# - pais nascimento - BRASILEIRO OU NAO
+# - cod regiao covid - one hot
+
+
 '''                                             NOTES - all the data bellow is now in lower case
                                                       - all the data bellow was collected on python shell using data['COLUMN_NAME'].unique()
 
@@ -110,7 +189,7 @@ data.drop(['FAIXAETARIA'], axis=1, inplace=True)
 
 COD_REGIAO_COVID: [16, 14,  1, 10, 11,  2, 12, 17,  7, 15, 20, 21,  5, 13,  3, 18,  6, 9,  8,  4, 19]
 
-REGIAO_COVID:['BAGE - R22', 'PASSO FUNDO - R17 R18 R19', 'SANTA MARIA - R01 R02',
+++ REGIAO_COVID:['BAGE - R22', 'PASSO FUNDO - R17 R18 R19', 'SANTA MARIA - R01 R02',
        'IJUI - R13', 'SANTA ROSA - R14', 'URUGUAIANA - R03',
        'PALMEIRA DAS MISSOES - R15 R20',
        'CAXIAS DO SUL - R23 R24 R25 R26', 'PORTO ALEGRE - R10',
@@ -123,14 +202,13 @@ REGIAO_COVID:['BAGE - R22', 'PASSO FUNDO - R17 R18 R19', 'SANTA MARIA - R01 R02'
 
 ++ FAIXA_ETARIA: ['15 a 19', '20 a 29', '40 a 49', '70 a 79', '50 a 59', '80 e mais', '60 a 69', '30 a 39', '10 a 14', '01 a 04', '05 a 09', '<1']
 
-CRITERIO: ['RT-PCR', 'TESTE RÁPIDO', 'Clínico Epidemiológico', 'Clínico-Imagem', 'Clínico', 'Outros testes']
-
+++ CRITERIO: [RT-PCR', 'TESTE RÁPIDO', 'Outros Testes', 'Clínico Epidemiológico', 'Clínico-Imagem', 'Clínico', 'Outros testes']
 ++ DATA_CONFIRMACAO: unique values 
 ++ DATA_SINTOMAS: unique values
 ++ DATA_INCLUSAO: unique values
 ++ DATA_EVOLUCAO: unique values
 
-EVOLUCAO: ['RECUPERADO', 'OBITO', 'OBITO OUTRAS CAUSAS']
+++ EVOLUCAO: ['RECUPERADO', 'OBITO', 'OBITO OUTRAS CAUSAS']
 
 ++ HOSPITALIZADO: ['NAO', 'SIM']
 
@@ -144,31 +222,20 @@ EVOLUCAO: ['RECUPERADO', 'OBITO', 'OBITO OUTRAS CAUSAS']
 
 ++ OUTROS: ['NAO', 'SIM', nan]
 
-CONDICOES: [nan, 'Doenças cardíacas crônicas', 'Doença Cardiovascular Crônica',
-       'Gestante', 'Diabetes', 'Obesidade',
-       'Doenças respiratórias crônicas descompensadas', 'Outros',
-       'Imunossupressão',
-       'Portador de doenças cromossômicas ou estado de fragilidade imunológica',
-       'Diabetes mellitus', 'Outra Pneumatopatia Crônica',
-       'Doença Renal Crônica', 'Asma', 'Imunodeficiência',
-       'Doenças renais crônicas em estágio avançado (graus 3',
-       'Doença Neurológica Crônica', 'Doença Hematológica Crônica',
-       'Puérpera (até 45 dias do parto)', 'Doença Hepática Crônica',
-       'Pneumatopatia Crônica', 'Puérpera', 'Síndrome de Down',
-       'Doença Hematológica Crônic', 'Gestante de alto risco']
+++ CONDICOES: ['nan', 'unique combinations']
 
 ++ GESTANTE: ['NAO', 'SIM' + lots of inconsistencies]
 
 ++ DATA_INCLUSAO_OBITO: unique values
 ++ DATA_EVOLUCAO_ESTIMADA: unique values
 
-RACA_COR: ['BRANCA', 'NAO INFORMADO', 'PARDA', 'PRETA', 'AMARELA', 'INDIGENA' + lots of inconsistencies]
+++ RACA_COR: ['BRANCA', 'NAO INFORMADO', 'PARDA', 'PRETA', 'AMARELA', 'INDIGENA']
 
-INDIGENA: [tribes names + lots of inconsistencies]
+++ INDIGENA: [tribes names + lots of inconsistencies]
 
 ++ PROFISSIONAL_SAUDE: ['SIM', 'NAO' + lots of inconsistencies]
 
-BAIRRO: neighborhood names, semi-unique values
+++ BAIRRO: neighborhood names, semi-unique values
 
 ++ SRAG: ['SIM', 'NAO' + lots of inconsistencies]
 
