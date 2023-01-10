@@ -5,7 +5,12 @@ from mlxtend.frequent_patterns import apriori, association_rules
 
 
 # importing data frame
-df = pd.read_csv('final.csv', sep=';')
+df = pd.read_csv('./data/final.csv')
+
+# **** NEED TO TAKE OUT NON NUMERIC ROWS TO RUN APRIORI ****
+df.drop(['Unnamed: 0', 'COD_IBGE', 'MUNICIPIO', 'COD_REGIAO_COVID', 'REGIAO_COVID', 'BAIRRO'], axis=1, inplace=True)
+
+print(df.info())
 
 # Building the model
 frq_items = apriori(df, min_support = 0.09, use_colnames = True)
@@ -20,4 +25,4 @@ rules.to_csv("./data/rules.csv")
 
 # printing rules
 print("RULES FOUND: ")
-print(rules.head(100))
+print(rules.head(100)) 
