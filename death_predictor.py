@@ -18,7 +18,7 @@ def precision_score(y_true, y_pred):
         itr += 1
     return(correct_preds/len(y_true))
 
-RUNALL = 0
+RUNALL = 1
 
 warnings.filterwarnings("ignore") # ignoring pandas data[x][y] deprecated warnings
 

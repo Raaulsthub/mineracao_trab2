@@ -28,7 +28,6 @@ data = data.apply(lambda x: x.astype(str).str.lower())
 data.fillna(0, inplace=True)
 
 # turning columns into zeros and ones
-# note: i want to add .astype(int) in the end
 data['SEXO'] = data['SEXO'].map({'masculino': 0, 'feminino': 1}).astype(int)
 data['HOSPITALIZADO'] = data['HOSPITALIZADO'].map({'sim': SIM, 'nao': NAO}).astype(int)
 data['FEBRE'] = data['FEBRE'].map({'sim': SIM, 'nao': NAO, 'nan': NAO}).astype(int)
@@ -58,7 +57,7 @@ for i in data['PAIS_NASCIMENTO']:
        if i != 'brasil':
               data['BRASILEIRO'][itr] = ESTRANGEIRO
        itr += 1
-
+       
 data.drop(['PAIS_NASCIMENTO'], axis=1, inplace=True)
 
 # etnia indigena will be implemented as yes or no
