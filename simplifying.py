@@ -14,5 +14,5 @@ df = df.astype(bool)
 
 print(df.info())
 
-# SAVING NEW DATA
+# saving data
 df.to_csv('./data/simpleDF.csv')

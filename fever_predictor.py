@@ -9,6 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 
+# precision calculation function
 def precision_score(y_true, y_pred):
     correct_preds = 0
     itr = 0
@@ -18,14 +19,16 @@ def precision_score(y_true, y_pred):
         itr += 1
     return(correct_preds/len(y_true))
 
+# debugging variable
 RUNALL = 1
 
-warnings.filterwarnings("ignore") # ignoring pandas data[x][y] deprecated warnings
+# ignoring pandas data[x][y] deprecated warnings
+warnings.filterwarnings("ignore")
 
+# importing dataset
 df = pd.read_csv('./data/final.csv')
 
-# PREPARING TRAIN/VALID/TEST 
-
+# preparing data
 df.drop(['Unnamed: 0', 'COD_IBGE', 'MUNICIPIO', 'COD_REGIAO_COVID', 'REGIAO_COVID', 'BAIRRO'], axis=1, inplace=True)
 df.drop(['PES_PRIV_LIBERDADE', 'BRASILEIRO', 'TESTE_RTPCR', 'TESTE_RAPIDO',
              'TESTE_OUTRO', 'TESTE_CLINICO_EPI', 'TESTE_CLINICO_IMG', 'TESTE_CLINICO', 'RACA_COR_BRANCA',
@@ -33,15 +36,15 @@ df.drop(['PES_PRIV_LIBERDADE', 'BRASILEIRO', 'TESTE_RTPCR', 'TESTE_RAPIDO',
                     'FONTE_SUS', 'FONTE_HOSP', 'FONTE_US', 'EVOLUCAO_RECUPERADO', 'EVOLUCAO_OBITO',
                          'EVOLUCAO_OBITO_OC', 'PROFISSIONAL_SAUDE'], axis=1, inplace=True)
 
-print(df.info())
-
 # target = fever?
 target = df['FEBRE']
 data = df.drop(['FEBRE'], axis=1)
 
+# train, test and valid sets split
 X_train_full, X_test, y_train_full, y_test  = train_test_split(data, target)
 X_train, X_valid, y_train, y_valid = train_test_split(X_train_full, y_train_full)
 
+# PREDICTOR 1 - MULTILAYER PERCEPTRON
 if RUNALL:
     model = keras.models.Sequential()
     model.add(keras.layers.Dense(256, activation='relu'))
@@ -56,7 +59,6 @@ if RUNALL:
     model.save('./saved_models/mlp_covid_febre.h5')
 
 # PREDICTOR 2 - LINEAR REGRESSION AND CLASSIFICATION
-
 if RUNALL:
     model = LinearRegression()
     model.fit(X_train_full, y_train_full)

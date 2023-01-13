@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 import warnings
 
-warnings.filterwarnings("ignore") # ignoring pandas data[x][y] deprecated warnings
+# ignoring pandas data[x][y] deprecated warnings
+warnings.filterwarnings("ignore") 
 
-
+# defines
 MEN = 0
 WOMEN = 1
 
@@ -17,7 +18,7 @@ ESTRANGEIRO = 0
 # importing the dataframe
 data = pd.read_csv('./data/saudeRS_2022.csv', sep=';')
 
-# PRINTING
+# printing initial data frame struct
 print('Initial Data Frame structure: ')
 print(data.info())
 
@@ -72,7 +73,7 @@ data['ETNIA_INDIGENA'] = aux
 # poping dates out of the data frame/
 data.drop(['DATA_CONFIRMACAO', 'DATA_SINTOMAS', 'DATA_INCLUSAO', 'DATA_EVOLUCAO', 'DATA_INCLUSAO_OBITO', 'DATA_EVOLUCAO_ESTIMADA'], axis=1, inplace=True)
 
-# ONE HOT ENCODING
+# one hot encoding
 
 # FAIXA ETARIA
 data['IDADE_1'] = np.zeros(len(data['FAIXAETARIA'])).astype(int)
@@ -146,7 +147,6 @@ for i in data['CRITERIO']:
 data.drop(['CRITERIO'], axis=1, inplace=True)
 
 # EVOLUCAO ['RECUPERADO', 'OBITO', 'OBITO OUTRAS CAUSAS']
-
 data['EVOLUCAO_RECUPERADO'] = np.zeros(len(data['EVOLUCAO'])).astype(int)
 data['EVOLUCAO_OBITO'] = np.zeros(len(data['EVOLUCAO'])).astype(int)
 data['EVOLUCAO_OBITO_OC'] = np.zeros(len(data['EVOLUCAO'])).astype(int)
@@ -208,11 +208,11 @@ for i in data['FONTE_INFORMACAO']:
 data.drop(['FONTE_INFORMACAO'], axis=1, inplace=True)
 
 
-# PRINTING
+# printing final structure
 print('Final Data Frame structure: ')
 print(data.info())
 
-# SAVING NEW DATA
+# saving data
 data.to_csv('./data/final.csv')
 
 
