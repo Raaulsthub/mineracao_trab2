@@ -7,7 +7,6 @@
 ### simplifying.py
 #### Retira certas colunas antes do apriori
 ### simple_apriori.py
-### simple_apriori.py
 #### Descobre as regras de associassão e salva em datasets localizados na pasta data
 ### death_predictor.py, fever_predictor.py
 #### Preditores, output não foi salvo, mas os programas são leves para rodar
